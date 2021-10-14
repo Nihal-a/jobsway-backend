@@ -1,9 +1,9 @@
-import express from 'express'
-import {getDashboard} from '../controllers/controllers.js'
+var express = require('express')
+var {getDashboard} = require('../controllers/controllers')
 
 const router  = express.Router();
 
 router.get('/', getDashboard)
 
 
-export default router;
+module.exports = router;

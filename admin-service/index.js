@@ -1,10 +1,16 @@
-import express from 'express'
-import routes from './routes/routes.js'
+var express = require('express')
+var routes = require('./routes/routes')
+var db = require('./config/connection')
 
 const PORT  = 3000;
 const app = express()
 
 app.use('/',routes)
+
+db.connect((err)=>{
+    if(err) console.log("Database Connection Error"+err);
+    else console.log("database Connected Successfully");
+})
 
 app.listen(PORT,(err) => {
     if(err) console.log("Server failed to start. Error : " + err);
