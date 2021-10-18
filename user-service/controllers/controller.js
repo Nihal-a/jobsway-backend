@@ -31,5 +31,25 @@ module.exports = {
         } catch (error) {
             res.status(500).json({error:error.message});
         }
+    },
+    signin : async(req,res) => {
+        const {email,password} = req.body
+        try {
+
+            var user =await db.get().collection(collection.USER_COLLECTION).findOne({email})
+
+            if(!user) return res.status(200).send('No account found.')
+
+            const isPasswordCorrect = await bcrypt.compare(password,user.password)
+
+            if(!isPasswordCorrect) return res.status(200).send('Incorrect Password')
+
+            const token = jwt.sign({email : user.email , id:user._id},'secret',{expiresIn:"1h"})
+
+            res.status(200).json({user,token})
+            
+        } catch (error) {
+            res.status(500).json({error:error.message});
+        }
     }
 }
