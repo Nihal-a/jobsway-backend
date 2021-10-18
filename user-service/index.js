@@ -1,9 +1,19 @@
-var express = require('express')
-var routes = require('./routes/routes')
-var db = require('./config/connection')
+const express = require('express')
+const routes = require('./routes/routes')
+const db = require('./config/connection')
+const cors = require('cors');
 
 const PORT  = 8000;
 const app = express()
+
+
+
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}));
+app.use(cors())
+
 
 app.use('/',routes)
 
