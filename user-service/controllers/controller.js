@@ -20,7 +20,11 @@ module.exports = {
 
             const hashedPassword = await bcrypt.hash(password,12)
 
-            let result = await db.get().collection(USER_COLLECTION).insertOne({email,password:hashedPassword,name:`${firstName} ${lastName}`})
+            var name = `${firstName} ${lastName}`
+
+            if(lastName == undefined) name = firstName;
+
+            let result = await db.get().collection(USER_COLLECTION).insertOne({email,password:hashedPassword,name})
 
             let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id:result.insertedId})
 
