@@ -17,7 +17,9 @@ module.exports = {
 
             if(!checkPassword)return res.status(200).json('Invalid Credentials.')
 
-            res.status(200).json(admin)
+            const token = jwt.sign({email : admin.email , id:admin._id},'secret',{expiresIn:"1h"})
+
+            res.status(200).json({admin,token})
         } catch (error) {
             res.status(400).json('Error in signin' + error)
         }
