@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const {USER_COLLECTION} = require('../config/collection')
 const collection = require('../config/collection')
-const {ObjectId} = require('mongodb')
+const {ObjectId, Admin} = require('mongodb')
 const { json } = require('body-parser')
 const { response } = require('express')
 const SERVICE_ID = process.env.SERVICE_ID
@@ -17,20 +17,8 @@ module.exports = {
         res.send('This is user home.')
     },
     signup : async(req,res) => {
-        const {email,firstName,lastName,password} = req.body
-        const userDetails= req.body
-        console.log(".....",userDetails);
+        const {email,firstName,lastName,password,phone} = req.body
         try {
-            if(userDetails.type){
-                client.verify
-                        .services(SERVICE_ID)
-                        .verifications.create({
-                            to:`+91${userDetails.number}`,
-                            channel:"sms"
-                        }).then((response)=> {
-                            res.status(200)
-                        })
-            }else{
                 var userExist =await db.get().collection(collection.USER_COLLECTION).find({email}).toArray()
 
                 if(userExist.length > 0) return res.status(200).send('User already exists')
@@ -48,7 +36,6 @@ module.exports = {
                 const token = jwt.sign({email:result.email,id:result.insertedId.str},'secret',{expiresIn:"1h"})
     
                 return res.status(200).json({user,token})
-            }
             
         } catch (error) {
             res.status(500).json({error:error.message});
@@ -74,7 +61,26 @@ module.exports = {
             res.status(500).json({error:error.message});
         }
     },
-    otpVerify: (req,res) => {
+    sendOtp: async(req,res) => {
+        const {phone} = req.body
+        try {
+            var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({phone})
+
+                if(userExist) return res.status(200).send('User already exist! Try login.')
+
+                client.verify
+                        .services(SERVICE_ID)
+                        .verifications.create({
+                            to:`+91${phone}`,
+                            channel:"sms"
+                        }).then((response)=> {
+                            res.status(200).json({status:'send'})
+                })
+        } catch (error) {
+            res.status(500).json({error:error.message});
+        }
+    },
+    verifyOtp: async(req,res) => {
         const {otp,number,firstName,lastName,password} = req.body
         try {
             client.verify
@@ -83,27 +89,24 @@ module.exports = {
                     to:number,
                     code:otp
                 }).then(async({valid}) => {
-
                     if(valid){
                         const hashedPassword = await bcrypt.hash(password,12)
     
                         var name = `${firstName} ${lastName}`
     
-                        if(lastName == undefined) name = firstName;
-    
-                        let result = await db.get().collection(USER_COLLECTION).insertOne({email,password:hashedPassword,name})
+                        let result = await db.get().collection(USER_COLLECTION).insertOne({phone,password:hashedPassword,name})
     
                         let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id:result.insertedId})
     
-                        const token = jwt.sign({email:result.email,id:result.insertedId.str},'secret',{expiresIn:"1h"})
+                        const token = jwt.sign({phone:result.phone,id:result.insertedId.str},'secret',{expiresIn:"1h"})
     
                         return res.status(200).json({user,token})
                     }else{
-
+                        res.json({Err:"Invalid OTP"})
                     }
                 })
         } catch (error) {
-            
+            res.json({error:error.message})
         }
     }
 }

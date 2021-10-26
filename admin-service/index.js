@@ -23,5 +23,5 @@ db.connect((err)=>{
 
 app.listen(PORT,(err) => {
     if(err) console.log("Server failed to start. Error : " + err);
-    else console.log(`Server started at port : ${PORT}.`);
+    else console.log(`ADMIN SERVICE - Server started at port : ${PORT}.`);
 })
