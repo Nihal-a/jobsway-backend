@@ -81,15 +81,16 @@ module.exports = {
         }
     },
     verifyOtp: async(req,res) => {
-        const {otp,number,firstName,lastName,password} = req.body
+        const {user,otp} = req.body
+        const {firstName,lastName,phone,password} = user
         try {
             client.verify
                 .services(SERVICE_ID)
                 .verificationChecks.create({
-                    to:number,
+                    to:`+91${phone}`,
                     code:otp
-                }).then(async({valid}) => {
-                    if(valid){
+                }).then(async(response) => {
+                    if(response.valid){
                         const hashedPassword = await bcrypt.hash(password,12)
     
                         var name = `${firstName} ${lastName}`
@@ -100,8 +101,9 @@ module.exports = {
     
                         const token = jwt.sign({phone:result.phone,id:result.insertedId.str},'secret',{expiresIn:"1h"})
     
-                        return res.status(200).json({user,token})
+                        res.status(200).json({user,token})
                     }else{
+                        console.log("Error ");
                         res.json({Err:"Invalid OTP"})
                     }
                 })
