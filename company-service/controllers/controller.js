@@ -16,8 +16,6 @@ module.exports = {
         try {
             var companyExist = await db.get().collection(collection.COMPANY_COLLECTION).findOne({email})
 
-            console.log(companyExist);
-
             if(companyExist) return res.status(200).send('Company already exists')
 
             companyDetails.password = await bcrypt.hash(companyDetails.password,10)
