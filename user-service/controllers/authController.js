@@ -19,9 +19,9 @@ module.exports = {
     signup : async(req,res) => {
         const {email,firstName,lastName,password,phone} = req.body
         try {
-                var userExist =await db.get().collection(collection.USER_COLLECTION).find({email}).toArray()
+                var userExist =await db.get().collection(collection.USER_COLLECTION).findOne({email})
 
-                if(userExist.length > 0) return res.status(200).send('User already exists')
+                if(userExist) return res.status(200).json({Err:'User already exists'})
     
                 const hashedPassword = await bcrypt.hash(password,12)
     
@@ -106,6 +106,47 @@ module.exports = {
                         res.json({Err:"Invalid OTP",user})
                     }
                 })
+        } catch (error) {
+            res.json({error:error.message})
+        }
+    },
+    googlesign : async(req,res) => {
+        const {email,firstName,lastName,password} = req.body
+        try {
+            var userExist =await db.get().collection(collection.USER_COLLECTION).findOne({email})
+
+            if(userExist){
+                var user =await db.get().collection(collection.USER_COLLECTION).findOne({email})
+
+                if(!user) return res.status(200).send('No account found.')
+
+                const isPasswordCorrect = await bcrypt.compare(password,user.password)
+
+                if(!isPasswordCorrect) return res.status(200).send('Incorrect Password')
+
+                const token = jwt.sign({email : user.email , id:user._id},'secret',{expiresIn:"1h"})
+
+                res.status(200).json({user,token})
+            }else{
+                var userExist =await db.get().collection(collection.USER_COLLECTION).findOne({email})
+
+                if(userExist) return res.status(200).json({Err:'User already exists'})
+    
+                const hashedPassword = await bcrypt.hash(password,12)
+    
+                var name = `${firstName} ${lastName}`
+    
+                if(lastName == undefined) name = firstName;
+    
+                let result = await db.get().collection(USER_COLLECTION).insertOne({email,password:hashedPassword,name})
+    
+                let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id:result.insertedId})
+    
+                const token = jwt.sign({email:result.email,id:result.insertedId.str},'secret',{expiresIn:"1h"})
+    
+                return res.status(200).json({user,token})
+            }
+
         } catch (error) {
             res.json({error:error.message})
         }
