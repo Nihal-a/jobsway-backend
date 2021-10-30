@@ -17,15 +17,12 @@ module.exports = {
     },
     verifyCompany : async(req,res) => {
         var id = req.query.id  
-        console.log("reached",id);
         try {
-            console.log(".....",ObjectId(id));
             var verifiedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
                 $set : {
                     status : true
                 }
             })
-            console.log("changed");
             res.status(200).json(verifiedCompany)
         } catch (error) {
             console.log(error);
