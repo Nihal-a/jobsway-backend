@@ -1,9 +1,15 @@
 var express = require('express')
-var {getDashboard ,signin} = require('../controllers/controllers')
+var { signin} = require('../controllers/authControllers')
+var {getUnVerifiedCompanies,verifyCompany} = require('../controllers/companyController')
 
 const router  = express.Router();
 
-router.get('/', getDashboard)
+//company routes
+router.get('/', getUnVerifiedCompanies)
+router.patch('/',verifyCompany)
+
+
+//Auth routes
 router.post('/signin',signin)
 
 

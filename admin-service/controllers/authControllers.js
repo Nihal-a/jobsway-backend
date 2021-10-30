@@ -1,11 +1,9 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
+const collection = require('../config/collection')
 
 module.exports = {
-    getDashboard : (req,res) => {
-        res.send('This is dashboard.')
-    },
     signin : async(req,res) => {
         const {email,password} = req.body;
         try {

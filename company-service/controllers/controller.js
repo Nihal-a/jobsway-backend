@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
-const {COMPANY_COLLECTION} = require('../config/collection')
 const collection = require('../config/collection')
 const { json } = require('body-parser')
 

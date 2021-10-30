@@ -14,7 +14,7 @@ app.use(express.urlencoded({
 app.use(cors())
 
 
-app.use('/',routes)
+app.use('/api/v1/company/',routes)
 
 db.connect((err)=>{
     if(err) console.log("Database Connection Error"+err);
