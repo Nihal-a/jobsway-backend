@@ -27,6 +27,7 @@ module.exports = {
 
             res.status(200).json({company,token})
         } catch (error) {
+            console.log(error);
             res.status(500).json({error:error.message})
         }
     },
@@ -46,6 +47,7 @@ module.exports = {
             res.status(200).json({company,token})
             
         } catch (error) {
+            console.log(error);
             res.status(500).json({error:error.message})
         }
     }

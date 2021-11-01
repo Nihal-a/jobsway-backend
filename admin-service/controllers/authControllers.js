@@ -19,6 +19,7 @@ module.exports = {
 
             res.status(200).json({admin,token})
         } catch (error) {
+            console.log(error);
             res.status(400).json('Error in signin' + error)
         }
     }

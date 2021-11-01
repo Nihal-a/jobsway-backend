@@ -12,6 +12,7 @@ module.exports = {
             res.status(200).json(unVerifiedCompanies)
 
         } catch (error) {
+            console.log(error);
             res.status(400).json(error)
         }
     },

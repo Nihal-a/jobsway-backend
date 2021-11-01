@@ -38,6 +38,7 @@ module.exports = {
                 return res.status(200).json({user,token})
             
         } catch (error) {
+            console.log(error);
             res.status(500).json({error:error.message});
         }
     },
@@ -58,6 +59,7 @@ module.exports = {
             res.status(200).json({user,token})
             
         } catch (error) {
+            console.log(error);
             res.status(500).json({error:error.message});
         }
     },
@@ -77,6 +79,7 @@ module.exports = {
                             res.status(200).json({status:'send'})
                 })
         } catch (error) {
+            console.log(error);
             res.status(500).json({error:error.message});
         }
     },
@@ -107,6 +110,7 @@ module.exports = {
                     }
                 })
         } catch (error) {
+            console.log(error);
             res.json({error:error.message})
         }
     },
@@ -148,6 +152,7 @@ module.exports = {
             }
 
         } catch (error) {
+            console.log(error);
             res.json({error:error.message})
         }
     }
