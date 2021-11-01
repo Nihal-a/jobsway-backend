@@ -7,8 +7,8 @@ const router  = express.Router();
 //company routes
 router.get('/', getUnVerifiedCompanies)
 router.get('/companies', getVerifiedCompanies)
-router.patch('/',verifyCompany)
-router.patch('/reject',rejectCompany)
+router.patch('/company/approve',verifyCompany)
+router.patch('/company/reject',rejectCompany)
 
 
 //Auth routes
