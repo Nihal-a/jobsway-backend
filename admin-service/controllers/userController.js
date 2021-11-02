@@ -6,7 +6,6 @@ const {ObjectId} = require('mongodb')
 
 module.exports = {
     getUsers :async (req,res) => {
-        console.log("readed");
         try {
             var allUsers = await db.get().collection(collection.USERS_COLLECTION).find({ban : false}).toArray()
 
@@ -17,4 +16,20 @@ module.exports = {
             res.status(400).json(error)
         }
     },
+    banUser: async(req,res) => {
+        id = req.query.id
+        console.log("ID" , id);
+        try {
+            var bannedUser = await db.get().collection(collection.USERS_COLLECTION).updateOne({_id:ObjectId(id)},{
+                $set : {
+                    ban : true
+                }
+            })
+            res.status(200).json(bannedUser)
+            
+        } catch (error) {
+            console.log(error);
+            res.status(400).json(error)
+        }
+    }
 }

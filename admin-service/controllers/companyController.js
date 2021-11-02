@@ -17,7 +17,6 @@ module.exports = {
         }
     },
     getVerifiedCompanies :async (req,res) => {
-        console.log("REached---------------------------");
         try {
             var verifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({status : true}).toArray()
 
