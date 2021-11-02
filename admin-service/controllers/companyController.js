@@ -18,7 +18,7 @@ module.exports = {
     },
     getVerifiedCompanies :async (req,res) => {
         try {
-            var verifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({status : true}).toArray()
+            var verifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({status : true,ban : false}).toArray()
 
             console.log(verifiedCompanies);
             res.status(200).json(verifiedCompanies)
@@ -53,6 +53,20 @@ module.exports = {
                 }
             })
             res.status(200).json(rejectCompany)
+        } catch (error) {
+            console.log(error);
+            res.status(400).json(error)
+        }
+    },
+    banCompany : async(req,res) => {
+        var id = req.query.id  
+        try {
+            var bannedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
+                $set : {
+                    ban : true,
+                }
+            })
+            res.status(200).json(bannedCompany)
         } catch (error) {
             console.log(error);
             res.status(400).json(error)
