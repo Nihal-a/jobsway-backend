@@ -20,7 +20,6 @@ module.exports = {
         try {
             var verifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({status : true,ban : false}).toArray()
 
-            console.log(verifiedCompanies);
             res.status(200).json(verifiedCompanies)
 
         } catch (error) {
@@ -61,15 +60,25 @@ module.exports = {
     banCompany : async(req,res) => {
         var id = req.query.id  
         try {
-            var bannedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
+            var banCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
                 $set : {
                     ban : true,
                 }
             })
-            res.status(200).json(bannedCompany)
+            res.status(200).json(banCompany)
         } catch (error) {
             console.log(error);
             res.status(400).json(error)
         }
     },
+    bannedCompanies : async (req,res) => {
+        try {
+            var bannedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({ban : true}).toArray()
+
+            res.status(200).json(bannedCompanies)
+        } catch (error) {
+            console.log(error);
+            res.status(400).json(error)
+        }
+    }
 }
