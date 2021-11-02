@@ -18,7 +18,6 @@ module.exports = {
     },
     banUser: async(req,res) => {
         id = req.query.id
-        console.log("ID" , id);
         try {
             var bannedUser = await db.get().collection(collection.USERS_COLLECTION).updateOne({_id:ObjectId(id)},{
                 $set : {
@@ -27,6 +26,16 @@ module.exports = {
             })
             res.status(200).json(bannedUser)
             
+        } catch (error) {
+            console.log(error);
+            res.status(400).json(error)
+        }
+    },
+    bannedUsers: async(req,res) => {
+        try {
+            var bannedUsers = await db.get().collection(collection.USERS_COLLECTION).find({ban : true}).toArray()
+
+            res.status(200).json(bannedUsers)
         } catch (error) {
             console.log(error);
             res.status(400).json(error)
