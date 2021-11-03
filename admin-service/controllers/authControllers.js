@@ -4,20 +4,20 @@ const db = require('../config/connection')
 const collection = require('../config/collection')
 
 module.exports = {
-    signin : async(req,res) => {
-        const {email,password} = req.body;
+    signin: async (req, res) => {
+        const { email, password } = req.body;
         try {
-            const admin =await db.get().collection('admin').findOne({email})
-            
-            if(!admin) return res.status(200).json('Invalid Credentials.')
+            const admin = await db.get().collection('admin').findOne({ email })
 
-            const checkPassword =await bcrypt.compare(password,admin.password)
+            if (!admin) return res.status(200).json('Invalid Credentials.')
 
-            if(!checkPassword)return res.status(200).json('Invalid Credentials.')
+            const checkPassword = await bcrypt.compare(password, admin.password)
 
-            const token = jwt.sign({email : admin.email , id:admin._id},'secret',{expiresIn:"1h"})
+            if (!checkPassword) return res.status(200).json('Invalid Credentials.')
 
-            res.status(200).json({admin,token})
+            const token = jwt.sign({ email: admin.email, id: admin._id }, 'secret', { expiresIn: "1h" })
+
+            res.status(200).json({ admin, token })
         } catch (error) {
             console.log(error);
             res.status(400).json('Error in signin' + error)

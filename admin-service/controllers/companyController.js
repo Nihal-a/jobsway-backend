@@ -2,12 +2,12 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const collection = require('../config/collection')
-const {ObjectId} = require('mongodb')
+const { ObjectId } = require('mongodb')
 
 module.exports = {
-    getUnVerifiedCompanies :async (req,res) => {
+    getUnVerifiedCompanies: async (req, res) => {
         try {
-            var unVerifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({status : false}).toArray()
+            var unVerifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({ status: false }).toArray()
 
             res.status(200).json(unVerifiedCompanies)
 
@@ -16,9 +16,9 @@ module.exports = {
             res.status(400).json(error)
         }
     },
-    getVerifiedCompanies :async (req,res) => {
+    getVerifiedCompanies: async (req, res) => {
         try {
-            var verifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({status : true,ban : false}).toArray()
+            var verifiedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({ status: true, ban: false }).toArray()
 
             res.status(200).json(verifiedCompanies)
 
@@ -27,12 +27,12 @@ module.exports = {
             res.status(400).json(error)
         }
     },
-    verifyCompany : async(req,res) => {
-        var id = req.query.id  
+    verifyCompany: async (req, res) => {
+        var id = req.query.id
         try {
-            var verifiedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
-                $set : {
-                    status : true
+            var verifiedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({ _id: ObjectId(id) }, {
+                $set: {
+                    status: true
                 }
             })
             res.status(200).json(verifiedCompany)
@@ -41,14 +41,14 @@ module.exports = {
             res.status(400).json(error)
         }
     },
-    rejectCompany : async(req,res) => {
-        var id = req.query.id  
-        var {reason} = req.body
+    rejectCompany: async (req, res) => {
+        var id = req.query.id
+        var { reason } = req.body
         try {
-            var rejectCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
-                $set : {
-                    status : "Rejected",
-                    reason : reason
+            var rejectCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({ _id: ObjectId(id) }, {
+                $set: {
+                    status: "Rejected",
+                    reason: reason
                 }
             })
             res.status(200).json(rejectCompany)
@@ -57,12 +57,12 @@ module.exports = {
             res.status(400).json(error)
         }
     },
-    banCompany : async(req,res) => {
-        var id = req.query.id  
+    banCompany: async (req, res) => {
+        var id = req.query.id
         try {
-            var banCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({_id:ObjectId(id)},{
-                $set : {
-                    ban : true,
+            var banCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({ _id: ObjectId(id) }, {
+                $set: {
+                    ban: true,
                 }
             })
             res.status(200).json(banCompany)
@@ -71,14 +71,28 @@ module.exports = {
             res.status(400).json(error)
         }
     },
-    bannedCompanies : async (req,res) => {
+    bannedCompanies: async (req, res) => {
         try {
-            var bannedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({ban : true}).toArray()
+            var bannedCompanies = await db.get().collection(collection.COMPANY_COLLECTION).find({ ban: true }).toArray()
 
             res.status(200).json(bannedCompanies)
         } catch (error) {
             console.log(error);
             res.status(400).json(error)
         }
-    }
+    },
+    unBanCompany: async (req, res) => {
+        var id = req.query.id
+        try {
+            var unBannedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({ _id: ObjectId(id) }, {
+                $set: {
+                    ban: false,
+                }
+            })
+            res.status(200).json(unBannedCompany)
+        } catch (error) {
+            console.log(error);
+            res.status(400).json(error)
+        }
+    },
 }

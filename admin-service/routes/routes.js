@@ -1,33 +1,30 @@
 var express = require('express')
-var { signin} = require('../controllers/authControllers')
-var { getUnVerifiedCompanies,verifyCompany,getVerifiedCompanies,rejectCompany,banCompany,bannedCompanies} = require('../controllers/companyController');
-var { getUsers,banUser,bannedUsers,unBanUser} = require('../controllers/userController');
+var { signin } = require('../controllers/authControllers')
+var { getUnVerifiedCompanies, verifyCompany, getVerifiedCompanies, rejectCompany, banCompany, bannedCompanies, unBanCompany } = require('../controllers/companyController');
+var { getUsers, banUser, bannedUsers, unBanUser } = require('../controllers/userController');
 var auth = require('../middlewares/AuthMiddleware')
 
-const router  = express.Router();
+const router = express.Router();
 
 //Auth routes
-router.post('/signin',signin)
+router.post('/signin', signin)
 
 
 //company routes
-router.get('/',getUnVerifiedCompanies)
+router.get('/', getUnVerifiedCompanies)
 router.get('/companies', getVerifiedCompanies)
-router.patch('/company/approve',verifyCompany)
-router.patch('/company/reject',rejectCompany)
-router.patch('/company/ban',banCompany)
-router.get('/companies/banned',bannedCompanies)
+router.patch('/company/approve', verifyCompany)
+router.patch('/company/reject', rejectCompany)
+router.patch('/company/ban', banCompany)
+router.patch('/company/unban', unBanCompany)
+router.get('/companies/banned', bannedCompanies)
 
 
 //Users
-router.get('/users',getUsers)
-router.patch('/user/ban',banUser)
-router.patch('/user/unban',unBanUser)
-router.get('/users/banned',bannedUsers)
-
-
-
-
+router.get('/users', getUsers)
+router.patch('/user/ban', banUser)
+router.patch('/user/unban', unBanUser)
+router.get('/users/banned', bannedUsers)
 
 
 module.exports = router;
