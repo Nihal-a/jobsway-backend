@@ -1,7 +1,7 @@
 var express = require('express')
 var { signin} = require('../controllers/authControllers')
 var { getUnVerifiedCompanies,verifyCompany,getVerifiedCompanies,rejectCompany,banCompany,bannedCompanies} = require('../controllers/companyController');
-var { getUsers,banUser,bannedUsers} = require('../controllers/userController');
+var { getUsers,banUser,bannedUsers,unBanUser} = require('../controllers/userController');
 var auth = require('../middlewares/AuthMiddleware')
 
 const router  = express.Router();
@@ -21,7 +21,8 @@ router.get('/companies/banned',bannedCompanies)
 
 //Users
 router.get('/users',getUsers)
-router.patch('/users/ban',banUser)
+router.patch('/user/ban',banUser)
+router.patch('/user/unban',unBanUser)
 router.get('/users/banned',bannedUsers)
 
 

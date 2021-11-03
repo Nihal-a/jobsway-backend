@@ -34,11 +34,29 @@ module.exports = {
     bannedUsers: async(req,res) => {
         try {
             var bannedUsers = await db.get().collection(collection.USERS_COLLECTION).find({ban : true}).toArray()
-
+            
             res.status(200).json(bannedUsers)
         } catch (error) {
             console.log(error);
             res.status(400).json(error)
         }
-    }
+    },
+    unBanUser: async(req,res) => {
+        console.log("reached");
+        id = req.query.id
+        console.log("id--",id);
+        try {
+            var unBannedUser = await db.get().collection(collection.USERS_COLLECTION).updateOne({_id:ObjectId(id)},{
+                $set : {
+                    ban : false
+                }
+            })
+            console.log(unBannedUser);
+            res.status(200).json(unBannedUser)
+            
+        } catch (error) {
+            console.log(error);
+            res.status(400).json(error)
+        }
+    },
 }
