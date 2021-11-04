@@ -2,9 +2,15 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const collection = require('../config/collection')
+const { validationResult } = require('express-validator');
 
 module.exports = {
-    signin: async (req, res) => {
+    signin : async (req, res) => {
+        
+        var errors = validationResult(req)
+
+        console.log("this is errors : " , errors.mapped());
+
         const { email, password } = req.body;
         try {
             const admin = await db.get().collection('admin').findOne({ email })

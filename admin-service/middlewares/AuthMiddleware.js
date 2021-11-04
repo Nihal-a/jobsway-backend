@@ -1,16 +1,9 @@
 var jwt = require('jsonwebtoken')
+var {check,validationResult} = require('express-validator')
 
-
-const auth = async (req,res,next) => {
-    try {
-        const token = req.header.Authorization.split(" ")[1];
-        let decodedData = jwt.verify(token,'secret')
-
-        req.adminId = decodedData?.id
-
-        next()
-    } catch (error) {
-        console.log({error:error.message});
-    }
+module.exports = {
+    validateSignin : [
+        check('email','Enter a valid email address').exists().isEmail(),
+        check('password','Password must be 8 characters long').exists().isLength({min : 8}),
+    ]
 }
-
