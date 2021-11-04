@@ -53,13 +53,17 @@ module.exports = {
         const { email, password } = req.body
         try {
 
+            if(email == '') return res.status(404).json({ errors: ' Email Cannot be blank.' })
+            
+            if(password == '') return res.status(404).json({ errors: ' Password Cannot be blank.' })
+
             var user = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
 
-            if (!user) return res.status(404).send('No account found.')
+            if (!user) return res.status(404).json({ errors: 'User Not found' })
 
             const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
-            if (!isPasswordCorrect) return res.status(200).send('Incorrect Password')
+            if (!isPasswordCorrect) return res.status(404).json({ errors: 'Invalid Password' })
 
             const token = jwt.sign({ email: user.email, id: user._id }, 'secret', { expiresIn: "1h" })
 
