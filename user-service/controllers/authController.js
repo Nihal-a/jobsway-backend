@@ -4,9 +4,6 @@ const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const {USER_COLLECTION} = require('../config/collection')
 const collection = require('../config/collection')
-const {ObjectId, Admin} = require('mongodb')
-const { json } = require('body-parser')
-const { response } = require('express')
 const SERVICE_ID = process.env.SERVICE_ID
 const ACCOUNT_SID = process.env.ACCOUNT_SID
 const AUTH_TOKEN = process.env.AUTH_TOKEN
@@ -48,7 +45,7 @@ module.exports = {
 
             var user =await db.get().collection(collection.USER_COLLECTION).findOne({email})
 
-            if(!user) return res.status(200).send('No account found.')
+            if(!user) return res.status(404).send('No account found.')
 
             const isPasswordCorrect = await bcrypt.compare(password,user.password)
 

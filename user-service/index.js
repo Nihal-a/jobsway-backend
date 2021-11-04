@@ -2,12 +2,17 @@ const express = require('express')
 const routes = require('./routes/routes')
 const db = require('./config/connection')
 const cors = require('cors');
+const logger = require('morgan')
+var fs = require('fs')
+var path = require('path')
 
 const PORT  = 8000;
 const app = express()
 
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 
 
+app.use(logger('combined',{stream : accessLogStream}))
 app.use(express.json());
 app.use(express.urlencoded({
   extended: true
