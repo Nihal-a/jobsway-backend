@@ -9,8 +9,6 @@ module.exports = {
         
         var errors = validationResult(req)
 
-        console.log("this is errors : " , errors.mapped());
-
         const { email, password } = req.body;
         try {
             const admin = await db.get().collection('admin').findOne({ email })

@@ -49,8 +49,11 @@ module.exports = {
             res.status(500).json({ error: error.message });
         }
     },
+    //signin user
     signin: async (req, res) => {
         const { email, password } = req.body
+        var errors = validationResult(req)
+
         try {
 
             if(email == '') return res.status(404).json({ errors: ' Email Cannot be blank.' })
@@ -130,7 +133,10 @@ module.exports = {
         try {
             var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
 
+            console.log("hiieiei" , userExist);
+
             if (userExist) {
+                
                 var user = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
 
                 if (!user) return res.status(200).send('No account found.')
@@ -143,9 +149,6 @@ module.exports = {
 
                 res.status(200).json({ user, token })
             } else {
-                var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
-
-                if (userExist) return res.status(200).json({ Err: 'User already exists' })
 
                 const hashedPassword = await bcrypt.hash(password, 12)
 

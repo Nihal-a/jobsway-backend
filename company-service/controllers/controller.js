@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const collection = require('../config/collection')
 const { json } = require('body-parser')
+const { ObjectId } = require('mongodb')
 
 
 module.exports = {
@@ -49,6 +50,37 @@ module.exports = {
         } catch (error) {
             console.log(error);
             res.status(500).json({error:error.message})
+        }
+    },
+    reregisterCompany : async (req,res) => {
+        const id = req.query.id
+        const {email} = req.body
+        const companyDetails = req.body
+        try {
+            var updatedCompany = await db.get().collection(collection.COMPANY_COLLECTION).updateOne({ _id: ObjectId(id)} , {
+                $set : {
+                    companyName : companyDetails.companyName,
+                    industry : companyDetails.industry,
+                    email : companyDetails.email,
+                    location : companyDetails.location,
+                    phone : companyDetails.phone,
+                    bio : companyDetails.bio,
+                    website : companyDetails.website,
+                    linkedIn : companyDetails.linkedIn,
+                    facebook : companyDetails.facebook,
+                    twitter : companyDetails.twitter,
+                    instagram : companyDetails.instagram,
+                    status : false,
+                    imgUrl : companyDetails.imgUrl,
+                    ban : false
+                },
+                $unset : {
+                    reason : ""
+                }
+            })
+            res.status(200).json({updatedCompany})
+        } catch (error) {
+            console.log(error);
         }
     }
 }
