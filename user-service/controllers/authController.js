@@ -133,8 +133,6 @@ module.exports = {
         try {
             var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
 
-            console.log("hiieiei" , userExist);
-
             if (userExist) {
                 
                 var user = await db.get().collection(collection.USER_COLLECTION).findOne({ email })

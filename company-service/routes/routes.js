@@ -1,9 +1,9 @@
 var express = require('express')
-var {getDashboard,registerCompany, loginCompany,reregisterCompany} = require('../controllers/controller')
+var {getCompanyDetails,registerCompany, loginCompany,reregisterCompany} = require('../controllers/controller')
 
 const router  = express.Router();
 
-router.get('/', getDashboard)
+router.get('/company/:id', getCompanyDetails)
 router.post('/register', registerCompany)
 router.post('/login', loginCompany)
 router.patch('/reregister', reregisterCompany)

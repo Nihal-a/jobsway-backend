@@ -6,9 +6,17 @@ const { json } = require('body-parser')
 const { ObjectId } = require('mongodb')
 
 
+
 module.exports = {
-    getDashboard : (req,res) => {
-        res.send('This is company dashboard.')
+    getCompanyDetails :async (req,res) => {
+        const id = req.params.id
+        try {
+            var company = await db.get().collection(collection.COMPANY_COLLECTION).findOne({_id : ObjectId(id)})
+
+            res.status(200).json({company})
+        } catch (error) {
+            res.status(500).json({error})
+        }
     },
     registerCompany:async(req,res) => {
         const {email} = req.body
@@ -16,7 +24,7 @@ module.exports = {
         try {
             var companyExist = await db.get().collection(collection.COMPANY_COLLECTION).findOne({email})
 
-            if(companyExist) return res.status(200).send('Company already exists')
+            if(companyExist) return res.status(400).json({error : 'Company already exists'})
 
             companyDetails.password = await bcrypt.hash(companyDetails.password,10)
 
@@ -34,21 +42,22 @@ module.exports = {
     },
     loginCompany : async(req,res) => {
         const {email,password} = req.body
+
         try {
+
             const company = await db.get().collection(collection.COMPANY_COLLECTION).findOne({email})
 
-            if(!company) return res.status(200).json('Company not found')
+            if(!company) return res.status(400).json({error : 'Company not found'})
 
             const isPasswordCorrect = await bcrypt.compare(password,company.password)
 
-            if(!isPasswordCorrect) return res.status(200).json('Incorrect Password')
+            if(!isPasswordCorrect) return res.status(400).json({error : 'Incorrect Password'})
 
             const token = jwt.sign({email:company.email,id:company._id.str},'secret',{expiresIn:"1h"})
 
             res.status(200).json({company,token})
             
         } catch (error) {
-            console.log(error);
             res.status(500).json({error:error.message})
         }
     },
@@ -78,9 +87,10 @@ module.exports = {
                     reason : ""
                 }
             })
-            res.status(200).json({updatedCompany})
+            var company = await db.get().collection(collection.COMPANY_COLLECTION).findOne({_id : ObjectId(id)})
+            res.status(200).json({company})
         } catch (error) {
-            console.log(error);
+            res.status(500).json({error:error.message})
         }
     }
 }
