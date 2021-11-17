@@ -8,16 +8,6 @@ const { ObjectId } = require('mongodb')
 
 
 module.exports = {
-    getCompanyDetails :async (req,res) => {
-        const id = req.params.id
-        try {
-            var company = await db.get().collection(collection.COMPANY_COLLECTION).findOne({_id : ObjectId(id)})
-
-            res.status(200).json({company})
-        } catch (error) {
-            res.status(500).json({error})
-        }
-    },
     registerCompany:async(req,res) => {
         const {email} = req.body
         const companyDetails = req.body
