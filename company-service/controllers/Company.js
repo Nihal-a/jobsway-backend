@@ -1,10 +1,17 @@
+require('dotenv').config()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const collection = require('../config/collection')
 const { json } = require('body-parser')
 const { ObjectId } = require('mongodb')
+const shortid = require('shortid')
+const Razorpay = require('razorpay')
 
+const razorpay = new Razorpay({
+    key_id: process.env.RZP_KEY_ID,
+    key_secret: process.env.RZP_KEY_SECRET,
+})
 
 
 module.exports = {
@@ -30,5 +37,28 @@ module.exports = {
         } catch (error) {
             res.status(500).json({Err : "Something went wrong"})
         }
-    }
+    },
+    addJobPayment : async (req,res) => {
+
+        const amount = req.body.amount
+        const currency = "INR"
+
+        const options = {
+            amount: amount * 100,  // amount in the smallest currency unit
+            currency,
+            receipt: shortid.generate()
+        }
+        try {
+            const result = await razorpay.orders.create(options)    
+
+            res.status(200).json({
+                id:result.id,
+                currency:result.currency,
+                amount:result.amount
+            })      
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : 'Somthing went wrong'})
+        }
+    } 
 }

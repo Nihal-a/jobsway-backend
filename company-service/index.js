@@ -21,6 +21,10 @@ app.use(cors())
 
 app.use('/api/v1/company/',routes)
 
+app.get('/logo.jpg' , (req , res) => {
+  res.sendFile(path.join(__dirname, "public/Images/logo.jpg"));
+})
+
 db.connect((err)=>{
     if(err) console.log("Database Connection Error"+err);
     else console.log("database Connected Successfully");
