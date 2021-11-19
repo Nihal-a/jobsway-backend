@@ -1,6 +1,6 @@
 var express = require('express')
 const {registerCompany, loginCompany,reregisterCompany} = require('../controllers/Auth');
-const { getCompanyDetails ,  addJob ,addJobPayment} = require('../controllers/Company');
+const { getCompanyDetails ,  addJob ,addJobPayment ,verifyPayment} = require('../controllers/Company');
 
 
 const router  = express.Router();
@@ -14,7 +14,11 @@ router.patch('/reregister', reregisterCompany)
 
 //Company
 router.post('/add-job' , addJob)
+
+
+//Payment
 router.post('/addjobpayment', addJobPayment)
+router.post('/verify-payment', verifyPayment)
 
 
 module.exports = router;

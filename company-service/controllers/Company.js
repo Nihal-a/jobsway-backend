@@ -7,6 +7,7 @@ const { json } = require('body-parser')
 const { ObjectId } = require('mongodb')
 const shortid = require('shortid')
 const Razorpay = require('razorpay')
+const {createHmac} = require('crypto')
 
 const razorpay = new Razorpay({
     key_id: process.env.RZP_KEY_ID,
@@ -58,7 +59,35 @@ module.exports = {
             })      
         } catch (error) {
             console.log(error);
-            res.status(500).json({Err : 'Somthing went wrong'})
+            res.status(500).json({Err : error})
         }
-    } 
+    },
+    verifyPayment : async (req,res) => {
+        const payDetails = req.body
+        try {
+            console.log(payDetails);
+            var hmac = createHmac('sha256',process.env.RZP_KEY_SECRET)
+
+            hmac.update(payDetails.order.data.id + '|' + payDetails.response.razorpay_payment_id)
+
+            var hmac = hmac.digest('hex')
+
+            if(hmac !== payDetails.response.razorpay_signature) return res.status(400).json({Err : 'Payment not Valid'})
+
+            await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id: ObjectId(payDetails.transactionDetails.jobId)}, {
+                $set : {
+                    status : true,
+                    payPlan : payDetails.transactionDetails.planName,
+                }
+            })
+
+            await db.get().collection(collection.TRANSACTIONS_COLLECTION).insertOne(payDetails.transactionDetails)
+            
+            res.status(200)
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
+    },
 }
