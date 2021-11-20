@@ -65,7 +65,6 @@ module.exports = {
     verifyPayment : async (req,res) => {
         const payDetails = req.body
         try {
-            console.log(payDetails);
             var hmac = createHmac('sha256',process.env.RZP_KEY_SECRET)
 
             hmac.update(payDetails.order.data.id + '|' + payDetails.response.razorpay_payment_id)
@@ -90,4 +89,23 @@ module.exports = {
             res.status(500).json({Err : error})
         }
     },
+    addFreeJob: async (req,res) => {
+        const jobDetails = req.body
+
+        try {
+
+        await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id: ObjectId(jobDetails.jobId)}, {
+            $set : {
+                status : true,
+                payPlan : 'Free',
+            }
+        })
+            
+        res.status(200)
+            
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
+    }
 }

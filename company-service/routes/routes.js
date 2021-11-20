@@ -1,6 +1,6 @@
 var express = require('express')
 const {registerCompany, loginCompany,reregisterCompany} = require('../controllers/Auth');
-const { getCompanyDetails ,  addJob ,addJobPayment ,verifyPayment} = require('../controllers/Company');
+const { getCompanyDetails ,  addJob ,addJobPayment ,verifyPayment, addFreeJob} = require('../controllers/Company');
 
 
 const router  = express.Router();
@@ -19,6 +19,7 @@ router.post('/add-job' , addJob)
 //Payment
 router.post('/addjobpayment', addJobPayment)
 router.post('/verify-payment', verifyPayment)
+router.post('/add-free-plan', addFreeJob)
 
 
 module.exports = router;
