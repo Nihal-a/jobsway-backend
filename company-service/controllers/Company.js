@@ -107,5 +107,22 @@ module.exports = {
             console.log(error);
             res.status(500).json({Err : error})
         }
+    },
+    getCompanyJobs : async(req,res) => {
+        const id = req.params.id
+        try {
+            const companyJobs = await db.get().collection(collection.JOBS_COLLECTION).find({
+                $and : [
+                    { companyId : ObjectId(id) },
+                    { status : true }
+                ]
+            }).toArray()
+
+            res.status(200).json(companyJobs)
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
     }
 }
