@@ -8,6 +8,7 @@ const { ObjectId } = require('mongodb')
 const shortid = require('shortid')
 const Razorpay = require('razorpay')
 const {createHmac} = require('crypto')
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 const razorpay = new Razorpay({
     key_id: process.env.RZP_KEY_ID,
@@ -124,5 +125,25 @@ module.exports = {
             console.log(error);
             res.status(500).json({Err : error})
         }
+    },
+    addTransaction : async(req,res) => {
+        const payDetails = req.body
+        console.log(payDetails);
+        try {
+            await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id: ObjectId(payDetails.jobId)}, {
+                $set : {
+                    status : true,
+                    payPlan : payDetails.planName,
+                }
+            })
+
+            await db.get().collection(collection.TRANSACTIONS_COLLECTION).insertOne(payDetails)
+
+            res.status(200)
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
     }
+    
 }
