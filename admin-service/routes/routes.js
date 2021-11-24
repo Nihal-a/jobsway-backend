@@ -1,6 +1,6 @@
 var express = require('express')
 var { signin } = require('../controllers/authControllers')
-var { getUnVerifiedCompanies, verifyCompany, getVerifiedCompanies, rejectCompany, banCompany, bannedCompanies, unBanCompany } = require('../controllers/companyController');
+var { getUnVerifiedCompanies, verifyCompany, getVerifiedCompanies, rejectCompany, banCompany, bannedCompanies, unBanCompany ,getTransactions} = require('../controllers/companyController');
 var { getUsers, banUser, bannedUsers, unBanUser } = require('../controllers/userController');
 var {validateSignin} =  require('../middlewares/AuthMiddleware')
 
@@ -19,6 +19,7 @@ router.patch('/company/reject', rejectCompany)
 router.patch('/company/ban', banCompany)
 router.patch('/company/unban', unBanCompany)
 router.get('/companies/banned', bannedCompanies)
+router.get('/transactions', getTransactions)
 
 
 //Users

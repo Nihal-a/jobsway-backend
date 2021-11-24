@@ -29,7 +29,7 @@ module.exports = {
     },
     addJob : async (req,res) => {
         const id = req.query.id
-        const jobDetails = {...req.body , companyId : ObjectId(id)}
+        const jobDetails = {...req.body , companyId : id}
         try {
             let result  = await db.get().collection(collection.JOBS_COLLECTION).insertOne(jobDetails)
 
@@ -114,7 +114,7 @@ module.exports = {
         try {
             const companyJobs = await db.get().collection(collection.JOBS_COLLECTION).find({
                 $and : [
-                    { companyId : ObjectId(id) },
+                    { companyId : id },
                     { status : true }
                 ]
             }).toArray()
@@ -140,6 +140,35 @@ module.exports = {
             await db.get().collection(collection.TRANSACTIONS_COLLECTION).insertOne(payDetails)
 
             res.status(200)
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
+    },
+    stripePayment : async (req,res) => {
+        payDetails = req.body
+        
+        try {
+
+            var amount;
+
+            if(payDetails.planName == 'Basic') {
+                amount = 399
+            }
+            if(payDetails.planName == 'Premium') {
+                amount = 899
+            }
+
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount : amount * 100,
+                currency : "INR",
+                automatic_payment_methods: {
+                    enabled: true,
+                },
+            })
+
+            res.status(200).json({ clientSecret: paymentIntent.client_secret,})
+            
         } catch (error) {
             console.log(error);
             res.status(500).json({Err : error})
