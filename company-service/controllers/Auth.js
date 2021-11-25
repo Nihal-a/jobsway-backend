@@ -4,14 +4,23 @@ const db = require('../config/connection')
 const collection = require('../config/collection')
 const { json } = require('body-parser')
 const { ObjectId } = require('mongodb')
-
+const { validationResult } = require('express-validator')
 
 
 module.exports = {
     registerCompany:async(req,res) => {
         const {email} = req.body
         const companyDetails = req.body
+        var errors = validationResult(req)
+
+        //Register Company
         try {
+
+            //Express Validator error.
+            if (!errors.isEmpty()) {
+               return res.status(400).json({ errors: errors.array() })
+            }
+
             var companyExist = await db.get().collection(collection.COMPANY_COLLECTION).findOne({email})
 
             if(companyExist) return res.status(400).json({error : 'Company already exists'})
@@ -30,6 +39,7 @@ module.exports = {
             res.status(500).json({error:error.message})
         }
     },
+    //Login company
     loginCompany : async(req,res) => {
         const {email,password} = req.body
 
@@ -51,6 +61,7 @@ module.exports = {
             res.status(500).json({error:error.message})
         }
     },
+    //Reregister company
     reregisterCompany : async (req,res) => {
         const id = req.query.id
         const {email} = req.body

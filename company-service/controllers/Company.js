@@ -128,7 +128,6 @@ module.exports = {
     },
     addTransaction : async(req,res) => {
         const payDetails = req.body
-        console.log(payDetails);
         try {
             await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id: ObjectId(payDetails.jobId)}, {
                 $set : {

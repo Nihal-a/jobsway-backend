@@ -8,3 +8,6 @@ module.exports = {
         check('lastName','Last name cannot be blank').exists().isLength({min : 1})
     ],
 }
+
+
+

@@ -77,6 +77,7 @@ module.exports = {
             res.status(500).json({ error: error.message });
         }
     },
+    //Send Otp 
     sendOtp: async (req, res) => {
         const { phone } = req.body
         try {
@@ -97,6 +98,7 @@ module.exports = {
             res.status(500).json({ error: error.message });
         }
     },
+    //Otp verification
     verifyOtp: async (req, res) => {
         const { user, otp } = req.body
         const { firstName, lastName, phone, password } = user
@@ -128,6 +130,7 @@ module.exports = {
             res.json({ error: error.message })
         }
     },
+    //Google Sign in
     googlesign: async (req, res) => {
         const { email, firstName, lastName, password } = req.body
         try {

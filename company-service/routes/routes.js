@@ -1,13 +1,14 @@
 var express = require('express')
 const {registerCompany, loginCompany,reregisterCompany} = require('../controllers/Auth');
 const { getCompanyDetails ,  addJob ,addJobPayment ,verifyPayment, addFreeJob,getCompanyJobs ,addTransaction,stripePayment} = require('../controllers/Company');
+const { validateCompanyRegistration } = require('../middlewares/JobVerification');
 
 
 const router  = express.Router();
 
 //Auth
 router.get('/company/:id', getCompanyDetails)
-router.post('/register', registerCompany)
+router.post('/register',validateCompanyRegistration,registerCompany)
 router.post('/login', loginCompany)
 router.patch('/reregister', reregisterCompany)
 
