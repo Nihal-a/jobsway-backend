@@ -1,7 +1,7 @@
-var express = require('express')
+var express = require('express');
 const {registerCompany, loginCompany,reregisterCompany} = require('../controllers/Auth');
 const { getCompanyDetails ,  addJob ,addJobPayment ,verifyPayment, addFreeJob,getCompanyJobs ,addTransaction,stripePayment} = require('../controllers/Company');
-const { validateCompanyRegistration } = require('../middlewares/JobVerification');
+const { validateCompanyRegistration, valdiateJobDetails } = require('../middlewares/JobVerification');
 
 
 const router  = express.Router();
@@ -14,7 +14,7 @@ router.patch('/reregister', reregisterCompany)
 
 
 //Company
-router.post('/add-job' , addJob)
+router.post('/add-job' ,valdiateJobDetails,addJob)
 router.get('/jobs/:id' , getCompanyJobs)
 
 

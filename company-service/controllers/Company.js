@@ -8,7 +8,9 @@ const { ObjectId } = require('mongodb')
 const shortid = require('shortid')
 const Razorpay = require('razorpay')
 const {createHmac} = require('crypto')
+const { validationResult } = require('express-validator')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
 
 const razorpay = new Razorpay({
     key_id: process.env.RZP_KEY_ID,
@@ -30,7 +32,15 @@ module.exports = {
     addJob : async (req,res) => {
         const id = req.query.id
         const jobDetails = {...req.body , companyId : id}
+        var errors = validationResult(req)
+        
         try {
+            
+            //Express Validator error.
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
+
             let result  = await db.get().collection(collection.JOBS_COLLECTION).insertOne(jobDetails)
 
             let job = await db.get().collection(collection.JOBS_COLLECTION).findOne({_id:result.insertedId})
