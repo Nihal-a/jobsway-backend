@@ -182,6 +182,19 @@ module.exports = {
             console.log(error);
             res.status(500).json({Err : error})
         }
+    },
+    getJobById : async(req,res) => {
+        const id = req.params.id
+
+        try {
+
+            var jobDetails =await db.get().collection(collection.JOBS_COLLECTION).findOne({_id : ObjectId(id)})
+
+            res.status(200).json(jobDetails)
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
     }
     
 }
