@@ -71,6 +71,8 @@ module.exports = {
             console.log(error);
             res.status(500).json({Err : error})
         }
+    },
+    editJob : async(req,res) => {
+        
     }
-    
 }

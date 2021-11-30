@@ -1,7 +1,7 @@
 var express = require('express');
 const {registerCompany , reregisterCompany , loginCompany} = require('../controllers/Auth');
 const {getCompanyDetails , getCompanyJobs } = require('../controllers/Company');
-const { getJobById , addJob , addFreeJob , deleteJob} = require('../controllers/Jobs');
+const { getJobById , addJob , addFreeJob , deleteJob , editJob} = require('../controllers/Jobs');
 const { addTransaction , addJobPayment , verifyPayment , stripePayment } = require('../controllers/payments');
 const {valdiateJobDetails , validateCompanyRegistration } = require('../middlewares/JobVerification')
 
@@ -22,7 +22,7 @@ router.post('/add-job' ,valdiateJobDetails,addJob)
 router.get('/job/:id' , getJobById)
 router.delete('/delete-job/:id' , deleteJob)
 router.post('/add-free-plan', addFreeJob)
-
+router.patch('/edit-job/:id&cid' , editJob)
 
 //Payment
 
