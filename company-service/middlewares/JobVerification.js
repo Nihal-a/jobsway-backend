@@ -16,8 +16,6 @@ module.exports = {
         check('jobCategory','Enter Job Category').exists(),
         check('minExp','Enter a valid Experience year').exists().isNumeric(),
         check('maxExp','Enter a valid Experience year').exists().isNumeric(),
-        check('minSalary','Enter a valid Salary').exists().isNumeric().isLength({min:0}),
-        check('maxSalary','Enter a valid Salary').exists().isNumeric().isLength({min:10}),
         check('timeSchedule','Choose Full time or part time').exists(),
         check('qualification','Enter a qualification').exists(),
         check('education','Enter Education').exists(),

@@ -73,6 +73,6 @@ module.exports = {
         }
     },
     editJob : async(req,res) => {
-        
+
     }
 }
