@@ -46,5 +46,28 @@ module.exports = {
             console.log(error);
             res.status(500).json({Err : error})
         }
+    },
+    applyJob : async (req , res) => {
+        const details = req.body
+
+        try {
+
+            await db.get().collection(collection.USER_COLLECTION).updateOne({_id : ObjectId(details.userId)} , {
+                    $addToSet : {
+                        appliedJobs : ObjectId(details.jobId)
+                    }
+            })
+
+            await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id : ObjectId(details.jobId)} , {
+                    $addToSet : {
+                        applications : details
+                    }
+            })
+
+            res.status(200).json({msg : 'Application Successfull'})
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
     }
 }
