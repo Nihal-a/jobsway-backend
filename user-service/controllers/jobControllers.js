@@ -49,8 +49,14 @@ module.exports = {
     },
     applyJob : async (req , res) => {
         const details = req.body
+        var errors = validationResult(req)
 
         try {
+            
+            //Express Validator error.
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
 
             await db.get().collection(collection.USER_COLLECTION).updateOne({_id : ObjectId(details.userId)} , {
                     $addToSet : {
@@ -64,7 +70,12 @@ module.exports = {
                     }
             })
 
-            res.status(200).json({msg : 'Application Successfull'})
+            let job = await db.get().collection(collection.JOBS_COLLECTION).findOne({_id : ObjectId(details.jobId)})
+
+            let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id : ObjectId(details.userId)})
+
+            res.status(200).json(job,user)
+
         } catch (error) {
             console.log(error);
             res.status(500).json({Err : error})
