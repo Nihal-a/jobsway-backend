@@ -2,14 +2,9 @@ const bcrypt = require('bcrypt')
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
-const { USER_COLLECTION } = require('../config/collection')
 const collection = require('../config/collection')
-const SERVICE_ID = process.env.SERVICE_ID
-const ACCOUNT_SID = process.env.ACCOUNT_SID
-const AUTH_TOKEN = process.env.AUTH_TOKEN
-const client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN)
 const { validationResult } = require('express-validator')
-const { ObjectId } = require('bson')
+const { cloudinary } = require('../utils/cloudinary')
 
 
 module.exports = {
@@ -48,33 +43,40 @@ module.exports = {
         }
     },
     applyJob : async (req , res) => {
-        const details = req.body
+        const {formData , image} = req.body
         var errors = validationResult(req)
 
         try {
+
+            // Express Validator error.
             
-            //Express Validator error.
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() })
             }
 
-            await db.get().collection(collection.USER_COLLECTION).updateOne({_id : ObjectId(details.userId)} , {
-                    $addToSet : {
-                        appliedJobs : ObjectId(details.jobId)
-                    }
+            const uploadedResponse = await cloudinary.uploader.upload(image , {
+                upload_preset : 'Applied_Users'
             })
+    
+            formData.imgUrl = uploadedResponse.url
 
-            await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id : ObjectId(details.jobId)} , {
-                    $addToSet : {
-                        applications : details
-                    }
-            })
+            // await db.get().collection(collection.USER_COLLECTION).updateOne({_id : ObjectId(details.userId)} , {
+            //         $addToSet : {
+            //             appliedJobs : ObjectId(details.jobId)
+            //         }
+            // })
 
-            let job = await db.get().collection(collection.JOBS_COLLECTION).findOne({_id : ObjectId(details.jobId)})
+            // await db.get().collection(collection.JOBS_COLLECTION).updateOne({_id : ObjectId(details.jobId)} , {
+            //         $addToSet : {
+            //             applications : details
+            //         }
+            // })
 
-            let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id : ObjectId(details.userId)})
+            // let job = await db.get().collection(collection.JOBS_COLLECTION).findOne({_id : ObjectId(details.jobId)})
 
-            res.status(200).json(job,user)
+            // let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id : ObjectId(details.userId)})
+
+            // res.status(200).json(job,user)
 
         } catch (error) {
             console.log(error);
