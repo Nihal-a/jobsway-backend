@@ -83,7 +83,11 @@ module.exports = {
 
             let user = await db.get().collection(collection.USER_COLLECTION).findOne({_id : ObjectId(formData.userId)})
 
-            res.status(200).json({job , user})
+            const token = jwt.sign({ email: user.email, id: user._id.str }, 'secret', { expiresIn: "1h" })
+
+            const userData = {user , token}
+
+            res.status(200).json({job , userData})
 
         } catch (error) {
             console.log(error);
