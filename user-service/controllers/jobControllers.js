@@ -67,9 +67,14 @@ module.exports = {
 
             formData.pdfUrl = pdfUploadedResponse.url
 
+            formData.status = 'PENDING' //APPROVED , REJECTED , PENDING
+
             await db.get().collection(collection.USER_COLLECTION).updateOne({_id : ObjectId(formData.userId)} , {
                     $addToSet : {
-                        appliedJobs : ObjectId(formData.jobId)
+                        appliedJobs :{
+                            id : ObjectId(formData.jobId) ,
+                            status : formData.status
+                        }
                     }
             })
 
@@ -78,6 +83,7 @@ module.exports = {
                         applications : formData
                     }
             })
+
 
             let job = await db.get().collection(collection.JOBS_COLLECTION).findOne({_id : ObjectId(formData.jobId)})
 
@@ -93,5 +99,58 @@ module.exports = {
             console.log(error);
             res.status(500).json({Err : error})
         }
-    }
+    },
+    getUserAppliedJobs : async (req,res) => {
+        
+        const id = req.params.id
+
+        try {
+
+            var appliedJobs = await db.get().collection(collection.USER_COLLECTION).aggregate([
+                {
+                    $match : {_id : ObjectId(id)}
+                },
+                {
+                    $unwind : "$appliedJobs"
+                },
+                {
+                    $project : {
+                        _id : 0,
+                        appliedJobs : 1
+                    }
+                },
+                {
+                    $lookup : {
+                        from : collection.JOBS_COLLECTION,
+                        localField : "appliedJobs",
+                        foreignField : "_id",
+                        as : 'appliedJobs'
+                    }
+                },
+                {
+                    $unwind : "$appliedJobs"
+                },
+                {
+                    $project : {
+                        "appliedJobs.jobTitle" : 1,
+                        "appliedJobs.companyId" : 1
+                    }
+                },
+                {
+                    $lookup : {
+                        from : collection.COMPANY_COLLECTION,
+                        localField : appliedJobs.companyId,
+                        foreignField : "_id",
+                        as : 'appliedJobs'
+                    }
+                },
+                
+            ]).toArray()
+
+            res.status(200).json(appliedJobs)
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({Err : error})
+        }
+    } 
 }
