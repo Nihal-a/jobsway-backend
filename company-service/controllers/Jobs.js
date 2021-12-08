@@ -9,7 +9,7 @@ const { validationResult } = require('express-validator')
 module.exports = {
     addJob : async (req,res) => {
         const id = req.query.id
-        const jobDetails = {...req.body , companyId : id}
+        const jobDetails = {...req.body , companyId : ObjectId(id)}
         var errors = validationResult(req)
         
         try {

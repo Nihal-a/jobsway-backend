@@ -22,7 +22,7 @@ module.exports = {
         try {
             const companyJobs = await db.get().collection(collection.JOBS_COLLECTION).find({
                 $and : [
-                    { companyId : id },
+                    { companyId : ObjectId(id) },
                     { status : true }
                 ]
             }).toArray()

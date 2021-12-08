@@ -139,7 +139,7 @@ module.exports = {
                 {
                     $lookup : {
                         from : collection.COMPANY_COLLECTION,
-                        localField : appliedJobs.companyId,
+                        localField : "appliedJobs.companyId",
                         foreignField : "_id",
                         as : 'appliedJobs'
                     }
