@@ -4,19 +4,16 @@ const jwt = require('jsonwebtoken')
 const db = require('../config/connection')
 const { USER_COLLECTION } = require('../config/collection')
 const collection = require('../config/collection')
-const SERVICE_ID = process.env.SERVICE_ID
-const ACCOUNT_SID = process.env.ACCOUNT_SID
-const AUTH_TOKEN = process.env.AUTH_TOKEN
-const client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN)
+const client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
 const { validationResult } = require('express-validator')
 
 
 module.exports = {
     getDashboard: (req, res) => {
-        res.send('This is user home.')
+        res.send('Hey , Welcome to JobsWay User Service')
     },
     signup: async (req, res) => {
-        const { email, firstName, lastName, password } = req.body
+        const { email, firstName, lastName, password , phone} = req.body
         var errors = validationResult(req)
 
         //Signup user
@@ -26,23 +23,40 @@ module.exports = {
                 return res.status(400).json({ errors: errors.array() })
             }
 
-            var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
+            var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({phone})
 
-            if (userExist) return res.status(400).json({ errors: 'User already exists' })
 
-            const hashedPassword = await bcrypt.hash(password, 12)
+            if (userExist) return res.status(401).json({ errors: 'User already exists' })
+            
+            //Send Otp 
+            try {
+    
+                client.verify
+                    .services(process.env.SERVICE_ID)
+                    .verifications.create({
+                        to: `+91${phone}`,
+                        channel: "sms"
+                    }).then(({status}) => {
+                        res.status(200).json({ status , userDetails : req.body})
+                    })
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: error.message });
+            }
 
-            var name = `${firstName} ${lastName}`
+            // const hashedPassword = await bcrypt.hash(password, 12)
 
-            if (lastName == undefined) name = firstName;
+            // var name = `${firstName} ${lastName}`
 
-            let result = await db.get().collection(USER_COLLECTION).insertOne({ email, password: hashedPassword, name, ban: false })
+            // if (lastName == undefined) name = firstName;
 
-            let user = await db.get().collection(collection.USER_COLLECTION).findOne({ _id: result.insertedId })
+            // let result = await db.get().collection(USER_COLLECTION).insertOne({ email, password: hashedPassword, name, ban: false })
 
-            const token = jwt.sign({ email: result.email, id: result.insertedId.str }, 'secret', { expiresIn: "1h" })
+            // let user = await db.get().collection(collection.USER_COLLECTION).findOne({ _id: result.insertedId })
 
-            return res.status(200).json({ user, token })
+            // const token = jwt.sign({ email: result.email, id: result.insertedId.str }, 'secret', { expiresIn: "1h" })
+
+            // return res.status(200).json({ user, token })
 
         } catch (error) {
             console.log(error);
@@ -51,22 +65,23 @@ module.exports = {
     },
     //signin user
     signin: async (req, res) => {
-        const { email, password } = req.body
+        const { email , password , phone } = req.body
         var errors = validationResult(req)
 
         try {
 
-            if(email == '') return res.status(404).json({ errors: ' Email Cannot be blank.' })
-            
-            if(password == '') return res.status(404).json({ errors: ' Password Cannot be blank.' })
+            //Express Validator error.
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
 
-            var user = await db.get().collection(collection.USER_COLLECTION).findOne({ email })
+            var user = await db.get().collection(collection.USER_COLLECTION).findOne({ phone })
 
             if (!user) return res.status(404).json({ errors: 'User Not found' })
 
             const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
-            if (!isPasswordCorrect) return res.status(404).json({ errors: 'Invalid Password' })
+            if (!isPasswordCorrect) return res.status(401).json({ errors: 'Invalid Password' })
 
             const token = jwt.sign({ email: user.email, id: user._id }, 'secret', { expiresIn: "1h" })
 
@@ -77,34 +92,35 @@ module.exports = {
             res.status(500).json({ error: error.message });
         }
     },
-    //Send Otp 
-    sendOtp: async (req, res) => {
-        const { phone } = req.body
-        try {
-            var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({ phone })
 
-            if (userExist) return res.status(200).send('User already exist! Try login.')
+    // sendOtp: async (req, res) => {
+    //     const { phone } = req.body
+    //     try {
+    //         var userExist = await db.get().collection(collection.USER_COLLECTION).findOne({ phone })
 
-            client.verify
-                .services(SERVICE_ID)
-                .verifications.create({
-                    to: `+91${phone}`,
-                    channel: "sms"
-                }).then((response) => {
-                    res.status(200).json({ status: 'send' })
-                })
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: error.message });
-        }
-    },
+    //         if (userExist) return res.status(200).send('User already exist! Try login.')
+
+    //         client.verify
+    //             .services(SERVICE_ID)
+    //             .verifications.create({
+    //                 to: `+91${phone}`,
+    //                 channel: "sms"
+    //             }).then((response) => {
+    //                 res.status(200).json({ status: 'send' })
+    //             })
+    //     } catch (error) {
+    //         console.log(error);
+    //         res.status(500).json({ error: error.message });
+    //     }
+    // },
+
     //Otp verification
     verifyOtp: async (req, res) => {
-        const { user, otp } = req.body
-        const { firstName, lastName, phone, password } = user
+        const { userDetails, otp } = req.body
+        const { firstName, lastName, phone, password , email } = userDetails
         try {
             client.verify
-                .services(SERVICE_ID)
+                .services(process.env.SERVICE_ID)
                 .verificationChecks.create({
                     to: `+91${phone}`,
                     code: otp
@@ -114,7 +130,7 @@ module.exports = {
 
                         var name = `${firstName} ${lastName}`
 
-                        let result = await db.get().collection(USER_COLLECTION).insertOne({ phone, password: hashedPassword, name, ban: false })
+                        let result = await db.get().collection(USER_COLLECTION).insertOne({ phone, password: hashedPassword, name, ban: false ,email})
 
                         let user = await db.get().collection(collection.USER_COLLECTION).findOne({ _id: result.insertedId })
 
@@ -122,7 +138,7 @@ module.exports = {
 
                         res.status(200).json({ user, token })
                     } else {
-                        res.json({ Err: "Invalid OTP", user })
+                        res.json({ Err: "Invalid OTP", userDetails })
                     }
                 })
         } catch (error) {
@@ -130,6 +146,7 @@ module.exports = {
             res.json({ error: error.message })
         }
     },
+
     //Google Sign in
     googlesign: async (req, res) => {
         const { email, firstName, lastName, password } = req.body

@@ -2,7 +2,7 @@ var express = require('express')
 const {getDashboard,signup,signin,verifyOtp,sendOtp, googlesign} = require('../controllers/authController');
 const { getCompanyDetails, getAllCompanies } = require('../controllers/compnayControllers');
 const { getFeaturedJobs, getAllJobs, getJobsByCompany, applyJob, getUserAppliedJobs } = require('../controllers/jobControllers');
-const {validateSignUp} = require('../middlewares/AuthMiddleware');
+const {validateSignUp, validateSignIn} = require('../middlewares/AuthMiddleware');
 const { validateApplyJob } = require('../middlewares/JobMiddleware');
 
 const router  = express.Router();
@@ -11,8 +11,8 @@ router.get('/',getDashboard)
 
 // Auth Routes.
 router.post('/signup',validateSignUp,signup)
-router.post('/signin',signin)
-router.post('/sendotp',sendOtp)
+router.post('/signin',validateSignIn,signin)
+// router.post('/sendotp',sendOtp)
 router.post('/verifyotp',verifyOtp)
 router.post('/googlesign',googlesign)
 
